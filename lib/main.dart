@@ -1,73 +1,59 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'config/constants.dart';
+import 'presentation/screens/home_screen.dart';
+import 'providers/party_provider.dart';
+import 'data/repositories/party_repository.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(
+
+    //MultiProvider is used to set up state management.
+    MultiProvider(
+      providers: [
+
+        //ChangeNotifierProvider creates and provides the PartyProvider instance to the entire app.
+        ChangeNotifierProvider(create: (context) => PartyProvider(PartyRepository())),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
+  //avoid unnecessary rebuilds
   const MyApp({super.key});
 
-  // This widget is the root of your application.
+  //MaterialApp is the root, provides global settings
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Party Planner',
+      title: appTitle,
       debugShowCheckedModeBanner: false,
       theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.orange),
+        colorScheme: colorScheme,
       ),
-      home: const MyHomePage(title: 'Party Planner'),
+      home: const MyHomePage(title: appTitle), //home is for navigation
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends StatelessWidget {
+  //avoid unnecessary rebuilds
   const MyHomePage({super.key, required this.title});
+
   final String title;
 
-  @override
-  State<MyHomePage> createState() => _MyHomePageState();
-}
-
-class _MyHomePageState extends State<MyHomePage> {
-  int _counter = 0;
-
-  void _incrementCounter() {
-    setState(() {
-      _counter++;
-    });
-  }
-
+  //Scaffold is the layout structure for single pages
   @override
   Widget build(BuildContext context) {
-    // This method is rerun every time setState is called, for instance as done
-    // by the _incrementCounter method above.
     return Scaffold(
       appBar: AppBar(
-        //Instead of changing the whole theme, changes a specific element
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
-        centerTitle: true, //set center for the android phone
+        backgroundColor: colorScheme.inversePrimary,
+        title: Text(title),
+        centerTitle: true, // Center the title for Android
       ),
-      body: Center(
-        // Center is a layout widget. It takes a single child and positions it
-        // in the middle of the parent.
-        child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: <Widget>[
-            const Text('You have pushed the button this many times:'),
-            Text(
-              '$_counter',
-              style: Theme.of(context).textTheme.headlineMedium,
-            ),
-          ],
-        ),
-      ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: _incrementCounter,
-        tooltip: 'Increment',
-        child: const Icon(Icons.add),
-      ), // This trailing comma makes auto-formatting nicer for build methods.
+      body: HomeScreen(), // body is for UI content
     );
   }
 }
