@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:intl/intl.dart';
 import 'package:party_planner/config/constants.dart';
 import 'package:provider/provider.dart';
+import '../../core/utils/party_form_utils.dart';
 import '../../data/models/contact_model.dart';
 import '../../data/models/party_model.dart';
 import '../../providers/party_provider.dart';
-import '../../core/services/contacts_service.dart';
+import '../widgets/guest_selection_dialog.dart';
 
 class PartyScreen extends StatefulWidget {
   final Party? party; // if null, we are creating a new party
@@ -46,105 +46,36 @@ class PartyScreenState extends State<PartyScreen> {
       );
       return;
     }
-    final DateTime fullDateTime = DateTime(
-      _selectedDate!.year,
-      _selectedDate!.month,
-      _selectedDate!.day,
-      _selectedTime!.hour,
-      _selectedTime!.minute,
+
+    // Use the helper to build the Party from the form.
+    final partyToSave = buildPartyFromForm(
+      existingId: widget.party?.id,
+      name: _nameController.text,
+      description: _descriptionController.text,
+      selectedDate: _selectedDate!,
+      selectedTime: _selectedTime!,
+      guests: _selectedGuests,
     );
+
     final partyProvider = Provider.of<PartyProvider>(context, listen: false);
-    if (widget.party == null) {
-      // Create mode.
-      partyProvider.addParty(_nameController.text, _descriptionController.text, fullDateTime, guests: _selectedGuests);
-    } else {
-      // Edit mode: create an updated party object.
-      final updatedParty = Party(
-        id: widget.party!.id,
-        name: _nameController.text,
-        description: _descriptionController.text,
-        date: fullDateTime,
-        guests: _selectedGuests,
-      );
-      partyProvider.updateParty(updatedParty);
-    }
+    partyProvider.upsertParty(partyToSave);
     Navigator.pop(context);
   }
 
   Future<void> _selectGuest() async {
-    final contactsService = ContactsServiceWrapper();
-    List<ContactModel> contacts = await contactsService.getContacts();
-    if (!mounted) return;
-    if (contacts.isEmpty) {
-      await showDialog(
-        context: context,
-        builder: (context) => AlertDialog(
-          title: const Text('No Contacts'),
-          content: const Text("No contacts available. Please ensure your contacts permission is granted in your device settings."),
-          actions: [
-            TextButton(onPressed: () => Navigator.pop(context), child: const Text('OK')),
-          ],
-        ),
-      );
-      return;
-    }
-    final alreadySelected = _selectedGuests.map((g) => g.identifier).toSet();
-    final Set<String> newSelections = {};
-    await showDialog(
+    final List<ContactModel>? selected = await showDialog<List<ContactModel>>(
       context: context,
-      builder: (context) {
-        return StatefulBuilder(
-          builder: (context, setStateDialog) {
-            return AlertDialog(
-              title: Text('Select Guests (${contacts.length} contacts)'),
-              content: SizedBox(
-                width: double.maxFinite,
-                height: 400,
-                child: ListView.builder(
-                  itemCount: contacts.length,
-                  itemBuilder: (context, index) {
-                    final contact = contacts[index];
-                    final isAlreadyAdded = alreadySelected.contains(contact.identifier);
-                    final isSelected = newSelections.contains(contact.identifier);
-                    return CheckboxListTile(
-                      title: Text(contact.displayName),
-                      value: isAlreadyAdded ? true : isSelected,
-                      onChanged: isAlreadyAdded
-                          ? null
-                          : (value) {
-                        setStateDialog(() {
-                          if (value == true) {
-                            newSelections.add(contact.identifier);
-                          } else {
-                            newSelections.remove(contact.identifier);
-                          }
-                        });
-                      },
-                    );
-                  },
-                ),
-              ),
-              actions: [
-                TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
-                ElevatedButton(
-                  onPressed: () {
-                    for (final contact in contacts) {
-                      if (newSelections.contains(contact.identifier) &&
-                          !_selectedGuests.any((g) => g.identifier == contact.identifier)) {
-                        _selectedGuests.add(contact);
-                      }
-                    }
-                    Navigator.pop(context);
-                  },
-                  child: const Text('Save'),
-                ),
-              ],
-            );
-          },
-        );
-      },
+      builder: (context) => GuestSelectionDialog(currentSelected: _selectedGuests),
     );
-    setState(() {});
+    if (selected != null) {
+      setState(() {
+        for (final contact in selected) {
+          if (!_selectedGuests.any((g) => g.identifier == contact.identifier)) {
+            _selectedGuests.add(contact);
+          }
+        }
+      });
+    }
   }
 
   @override
