@@ -56,24 +56,18 @@ class HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _sendInvitationsAndShowStatus(Party party) async {
-    final invitationResult = await Provider.of<PartyProvider>(context, listen: false)
+    final result = await Provider.of<PartyProvider>(context, listen: false)
         .inviteGuests(party);
-    final failed = invitationResult["failed"]!;
-    final missing = invitationResult["missing"]!;
 
-    // Compute all guest names that have valid emails.
-    final List<String> validGuestNames = party.guests
-        .where((g) => g.email != null && g.email!.isNotEmpty)
-        .map((g) => g.displayName)
-        .toList();
+    // Cast each returned list to List<String>.
+    final List<String> invited = List<String>.from(result["invited"] ?? []);
+    final List<String> updated = List<String>.from(result["updated"] ?? []);
+    final List<String> missing = List<String>.from(result["missing"] ?? []);
 
-    // If sending succeeded (i.e. no failures), assume all valid emails succeeded.
-    final List<String> succeeded = failed.isEmpty ? validGuestNames : [];
-
-    // Build the status message using the helper.
+    // Build the status message using our helper.
     final message = buildInvitationStatusMessage(
-      succeeded: succeeded,
-      failed: failed,
+      invited: invited,
+      updated: updated,
       missing: missing,
     );
 

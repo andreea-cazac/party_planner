@@ -36,7 +36,7 @@ class PartyCard extends StatelessWidget {
         ),
         trailing: IconButton(
           icon: const Icon(Icons.email),
-          onPressed: party.guests.isEmpty ? null : onInvitePressed,
+          onPressed: onInvitePressed,
         ),
       ),
     );

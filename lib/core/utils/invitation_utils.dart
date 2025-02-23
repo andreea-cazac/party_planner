@@ -31,25 +31,32 @@ GuestEmailResult processGuestEmails(List<ContactModel> guests) {
   return GuestEmailResult(validEmails: validEmails, missingEmails: missingEmails);
 }
 
-/// Builds a status message for the invitation process.
+/// Builds a status message for the current invitation process.
 String buildInvitationStatusMessage({
-  required List<String> succeeded,
-  required List<String> failed,
+  required List<String> invited,
+  required List<String> updated,
   required List<String> missing,
 }) {
-  String message = "";
-  if (succeeded.isNotEmpty && failed.isEmpty && missing.isEmpty) {
-    message = "Invitations sent successfully to everyone!";
-  } else {
-    if (succeeded.isNotEmpty) {
-      message += "Invitations sent successfully to:\n\n${succeeded.join(', ')}\n\n";
-    }
-    if (failed.isNotEmpty) {
-      message += "Failed to send invitation to:\n\n${failed.join(', ')}\n\n";
-    }
-    if (missing.isNotEmpty) {
-      message += "Failed to send invitation to:\n\n${missing.join(', ')} because no email was provided by the contact.";
-    }
+  // If neither invites nor updates were sent, return a neutral message.
+  if (invited.isEmpty && updated.isEmpty) {
+    return "No new updates have been done. Update the party if you want to send an update to the invited guests.";
   }
+
+  String message = "";
+
+  if (invited.isNotEmpty) {
+    message += "Invitation emails sent to:\n\n${invited.join(', ')}";
+  }
+
+  if (updated.isNotEmpty) {
+    if (message.isNotEmpty) message += "\n\n";
+    message += "Update emails sent to:\n\n${updated.join(', ')}";
+  }
+
+  if (missing.isNotEmpty) {
+    if (message.isNotEmpty) message += "\n\n";
+    message += "No email provided for:\n\n${missing.join(', ')}";
+  }
+
   return message;
 }

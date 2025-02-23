@@ -16,6 +16,8 @@ class PartyProvider with ChangeNotifier {
   final InviteGuestsUseCase _inviteGuestsUseCase;
   //final EmailSenderService _emailSenderService;
   List<Party> _parties = [];
+  // Track the last invited state for each party by its ID.
+  final Map<String, Party> _lastInvitedParties = {};
 
   PartyProvider(this._repository, EmailSenderService emailSenderService)
       : _upsertPartyUseCase = UpsertPartyUseCase(_repository),
@@ -39,6 +41,13 @@ class PartyProvider with ChangeNotifier {
   }
 
   Future<Map<String, List<String>>> inviteGuests(Party party) async {
-    return await _inviteGuestsUseCase.execute(party);
+    Party? oldParty = _lastInvitedParties[party.id];
+    final result = await _inviteGuestsUseCase.execute(newParty: party, oldParty: oldParty);
+    // For both new invites and update emails, update the stored state.
+    if ((result["invited"] != null && result["invited"]!.isNotEmpty) ||
+        (result["updated"] != null && result["updated"]!.isNotEmpty)) {
+      _lastInvitedParties[party.id] = party;
+    }
+    return result;
   }
 }

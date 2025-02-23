@@ -63,6 +63,8 @@ class PartyScreenState extends State<PartyScreen> {
   }
 
   Future<void> _selectGuest() async {
+    // When editing, disable adding new guests.
+    if (widget.party != null) return;
     final List<ContactModel>? selected = await showDialog<List<ContactModel>>(
       context: context,
       builder: (context) => GuestSelectionDialog(currentSelected: _selectedGuests),
@@ -126,6 +128,8 @@ class PartyScreenState extends State<PartyScreen> {
                     ? 'Select Time'
                     : _selectedTime!.format(context)),
               ),
+              // Only allow guest selection in creation mode.
+              if (!isEditing)
               ElevatedButton(
                 onPressed: _selectGuest,
                 child: const Text('Add Guest'),
