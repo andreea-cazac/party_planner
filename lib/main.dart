@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:party_planner/core/services/email_sender_service.dart';
 import 'package:provider/provider.dart';
 import 'config/constants.dart';
 import 'presentation/screens/home_screen.dart';
@@ -13,7 +14,7 @@ void main() {
       providers: [
 
         //ChangeNotifierProvider creates and provides the PartyProvider instance to the entire app.
-        ChangeNotifierProvider(create: (context) => PartyProvider(PartyRepository())),
+        ChangeNotifierProvider(create: (context) => PartyProvider(PartyRepository(), EmailSenderService())),
       ],
       child: const MyApp(),
     ),
