@@ -1,3 +1,4 @@
+import 'package:party_planner/data/models/contact_model.dart';
 import 'package:uuid/uuid.dart';
 
 class Party {
@@ -5,12 +6,14 @@ class Party {
   String name;
   String description;
   DateTime date;
+  List<ContactModel> guests;
 
   Party({
     required this.id,
     required this.name,
     required this.description,
     required this.date,
+    required this.guests,
   });
 
   // Generate a unique ID when creating a new Party

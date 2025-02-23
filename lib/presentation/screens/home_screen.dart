@@ -19,10 +19,26 @@ class HomeScreen extends StatelessWidget {
         itemCount: partyProvider.parties.length,
         itemBuilder: (context, index) {
           final party = partyProvider.parties[index];
-          return ListTile(
-            title: Text(party.name),
-            subtitle: Text('${party.description}\n${DateFormat('dd/MM/yyyy HH:mm').format(party.date)}'),
-            //isThreeLine: true,
+          return Card(
+            margin: const EdgeInsets.all(8.0),
+            child: ListTile(
+              title: Text(party.name),
+              subtitle: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    '${party.description}\n${DateFormat('dd/MM/yyyy HH:mm').format(party.date)}',
+                  ),
+                  const SizedBox(height: 4.0),
+                  Text(
+                    party.guests.isNotEmpty
+                        ? "Guests: ${party.guests.map((g) => g.displayName).join(", ")}"
+                        : "No guests added",
+                    style: TextStyle(fontStyle: FontStyle.italic, color: Colors.grey[700]),
+                  ),
+                ],
+              ),
+            ),
           );
         },
       ),

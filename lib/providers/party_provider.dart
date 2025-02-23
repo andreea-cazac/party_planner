@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import '../data/models/contact_model.dart';
 import '../data/models/party_model.dart';
 import '../data/repositories/party_repository.dart';
 import '../domain/use_cases/add_party_use_case.dart';
@@ -26,12 +27,13 @@ class PartyProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  void addParty(String name, String description, DateTime date) {
+  void addParty(String name, String description, DateTime date, {List<ContactModel>? guests}) {
     final party = Party(
       id: Party.generateId(),
       name: name,
       description: description,
       date: date,
+      guests: guests ?? [], // Default to an empty list if guests is null. Because guests is optional
     );
 
     _addPartyUseCase.execute(party, _parties);
