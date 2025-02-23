@@ -43,6 +43,17 @@ class PartyProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateParty(Party updatedParty) {
+    // Find the party with the same id and update it.
+    int index = _parties.indexWhere((p) => p.id == updatedParty.id);
+    if (index != -1) {
+      _parties[index] = updatedParty;
+      // Optionally, save changes via the repository if needed.
+      _repository.saveParties(_parties);
+      notifyListeners();
+    }
+  }
+
   /// Sends one universal invitation email using BCC.
   /// Returns a Map with two keys:
   ///   "failed": a list of guest display names for whom the invitation failed (e.g. if sending throws an error),
@@ -51,6 +62,7 @@ class PartyProvider with ChangeNotifier {
     // Separate guests based on email availability.
     final List<String> validEmails = [];
     final List<String> missingEmails = [];
+
     for (final guest in party.guests) {
       if (guest.email == null || guest.email!.isEmpty) {
         missingEmails.add(guest.displayName);

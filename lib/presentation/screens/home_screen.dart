@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:party_planner/presentation/screens/party_screen.dart';
 import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import '../../data/models/party_model.dart';
 import '../../providers/party_provider.dart';
-import 'add_party_screen.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -74,6 +74,13 @@ class HomeScreenState extends State<HomeScreen> {
           return Card(
             margin: const EdgeInsets.all(8.0),
             child: ListTile(
+              onTap: () {
+                // Navigate to PartyScreen in edit mode.
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PartyScreen(party: party)),
+                );
+              },
               title: Text(party.name),
               subtitle: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -107,7 +114,7 @@ class HomeScreenState extends State<HomeScreen> {
         onPressed: () {
           Navigator.push(
             context, //it tells flutter where in the widget tree we are
-            MaterialPageRoute(builder: (context) => AddPartyScreen()), //new page slide effect (navigation animation)
+            MaterialPageRoute(builder: (context) => const PartyScreen()), //new page slide effect (navigation animation)
           );
         },
         child: const Icon(Icons.add),
