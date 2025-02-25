@@ -34,29 +34,43 @@ GuestEmailResult processGuestEmails(List<ContactModel> guests) {
 /// Builds a status message for the current invitation process.
 String buildInvitationStatusMessage({
   required List<String> invited,
-  required List<String> updated,
+  required List<String>? updated,
   required List<String> missing,
 }) {
-  // If neither invites nor updates were sent, return a neutral message.
-  if (invited.isEmpty && updated.isEmpty) {
-    return "No new updates have been done. Update the party if you want to send an update to the invited guests.";
+
+  List<String> messageParts = [];
+
+  // Determine the scenario.
+  final bool isUpdateScenario = updated != null;
+  final bool hasInvitations = invited.isNotEmpty;
+  final bool hasUpdates = updated != null && updated.isNotEmpty;
+
+  if (isUpdateScenario) {
+    // Update scenario: updated is non-null.
+    if (!hasInvitations && !hasUpdates) {
+      // No invitations or updates were sent.
+      messageParts.add(
+          "No new updates have been done. Update the party if you want to send an update to the invited guests."
+      );
+    } else {
+      if (hasInvitations) {
+        messageParts.add("Invitation emails have been created for: ${invited.join(', ')}");
+      }
+      if (hasUpdates) {
+        messageParts.add("Update emails have been created for: ${updated!.join(', ')}");
+      }
+    }
+  } else {
+    // New party scenario: updated is null.
+    if (hasInvitations) {
+      messageParts.add("Invitation emails have been created for: ${invited.join(', ')}");
+    }
   }
 
-  String message = "";
-
-  if (invited.isNotEmpty) {
-    message += "Invitation emails sent to:\n\n${invited.join(', ')}";
-  }
-
-  if (updated.isNotEmpty) {
-    if (message.isNotEmpty) message += "\n\n";
-    message += "Update emails sent to:\n\n${updated.join(', ')}";
-  }
-
+  // Always add missing email info if present.
   if (missing.isNotEmpty) {
-    if (message.isNotEmpty) message += "\n\n";
-    message += "No email provided for:\n\n${missing.join(', ')}";
+    messageParts.add("No email provided for: ${missing.join(', ')}");
   }
 
-  return message;
+  return messageParts.join("\n\n");
 }

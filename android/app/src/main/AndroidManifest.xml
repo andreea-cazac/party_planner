@@ -3,6 +3,7 @@
 
     <!-- Add contact permissions here -->
     <uses-permission android:name="android.permission.READ_CONTACTS"/>
+    <uses-permission android:name="android.permission.WRITE_CONTACTS"/>
 
     <application
         android:label="party_planner"

@@ -36,7 +36,7 @@ class PartyScreenState extends State<PartyScreen> {
   }
 
   void _saveParty(BuildContext context) {
-    if (_nameController.text.isEmpty || _descriptionController.text.isEmpty || _selectedDate == null || _selectedTime == null) {
+    if (_nameController.text.isEmpty || _descriptionController.text.isEmpty || _selectedDate == null || _selectedTime == null || _selectedGuests.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: const Text('Please fill in all fields before saving.'),

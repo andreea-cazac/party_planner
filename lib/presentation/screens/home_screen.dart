@@ -1,9 +1,12 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:party_planner/presentation/screens/party_screen.dart';
 import 'package:provider/provider.dart';
+import '../../config/native_components.dart';
 import '../../core/utils/invitation_utils.dart';
 import '../../data/models/party_model.dart';
 import '../../providers/party_provider.dart';
+import '../../routes/app_router.dart';
 import '../widgets/party_card.dart';
 
 class HomeScreen extends StatefulWidget {
@@ -22,7 +25,20 @@ class HomeScreenState extends State<HomeScreen> {
     final partyProvider = Provider.of<PartyProvider>(context);
 
     return Scaffold(
-      appBar: AppBar(title: const Text('Upcoming Parties')),
+      appBar: AppBar(
+        title: Padding(
+          padding: const EdgeInsets.only(top: 20.0),
+          child: const Text(
+            'Upcoming Parties',
+            style: TextStyle(
+              color: Colors.orange, // Title color set to orange.
+              fontSize: 20,          // Android-specific font size.
+            ),
+          ),
+        ),
+        centerTitle: true, // Centers the title on Android.
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
+      ),
       body: ListView.builder(
         itemCount: partyProvider.parties.length,
         itemBuilder: (context, index) {
@@ -30,10 +46,7 @@ class HomeScreenState extends State<HomeScreen> {
           return PartyCard(
             party: party,
             onTap: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => PartyScreen(party: party)),
-              );
+              Navigator.of(context).push(createRoute(PartyScreen(party: party)));
             },
             onInvitePressed: party.guests.isEmpty
                 ? null
@@ -45,12 +58,12 @@ class HomeScreenState extends State<HomeScreen> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          Navigator.push(
-            context, //it tells flutter where in the widget tree we are
-            MaterialPageRoute(builder: (context) => const PartyScreen()), //new page slide effect (navigation animation)
-          );
+          Navigator.of(context).push(createRoute(PartyScreen()));
         },
-        child: const Icon(Icons.add),
+        child: Icon(getNativeIcon(
+          materialIcon: Icons.add_circle_outline,
+          cupertinoIcon: CupertinoIcons.add,
+        )),
       ),
     );
   }
@@ -61,7 +74,7 @@ class HomeScreenState extends State<HomeScreen> {
 
     // Cast each returned list to List<String>.
     final List<String> invited = List<String>.from(result["invited"] ?? []);
-    final List<String> updated = List<String>.from(result["updated"] ?? []);
+    final List<String>? updated = result["updated"];
     final List<String> missing = List<String>.from(result["missing"] ?? []);
 
     // Build the status message using our helper.

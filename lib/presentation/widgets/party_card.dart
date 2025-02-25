@@ -1,4 +1,6 @@
+import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import '../../config/native_components.dart';
 import '../../core/utils/date_utils.dart';
 import '../../data/models/party_model.dart';
 
@@ -35,7 +37,10 @@ class PartyCard extends StatelessWidget {
           ],
         ),
         trailing: IconButton(
-          icon: const Icon(Icons.email),
+          icon: Icon(getNativeIcon(
+            materialIcon: Icons.email,
+            cupertinoIcon: CupertinoIcons.mail,
+          )),
           onPressed: onInvitePressed,
         ),
       ),

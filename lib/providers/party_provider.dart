@@ -36,13 +36,13 @@ class PartyProvider with ChangeNotifier {
 
   void upsertParty(Party party) {
     _upsertPartyUseCase.execute(party);
-    //_repository.saveParties(_parties);
     notifyListeners();
   }
 
-  Future<Map<String, List<String>>> inviteGuests(Party party) async {
+  Future<Map<String, List<String>?>> inviteGuests(Party party) async {
     Party? oldParty = _lastInvitedParties[party.id];
     final result = await _inviteGuestsUseCase.execute(newParty: party, oldParty: oldParty);
+
     // For both new invites and update emails, update the stored state.
     if ((result["invited"] != null && result["invited"]!.isNotEmpty) ||
         (result["updated"] != null && result["updated"]!.isNotEmpty)) {
