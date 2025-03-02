@@ -28,6 +28,8 @@
 	<true/>
 	<key>NSContactsUsageDescription</key>
 	<string>Reason we need access to the contact list</string>
+	<key>NSCalendarsUsageDescription</key>
+    <string>This app requires calendar access to add and update party events.</string>
 	<key>UIApplicationSupportsIndirectInputEvents</key>
 	<true/>
 	<key>UILaunchStoryboardName</key>

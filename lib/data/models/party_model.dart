@@ -7,6 +7,7 @@ class Party {
   String description;
   DateTime date;
   List<ContactModel> guests;
+  String? calendarEventId;
 
   Party({
     required this.id,
@@ -14,6 +15,7 @@ class Party {
     required this.description,
     required this.date,
     required this.guests,
+    this.calendarEventId,
   });
 
   // Generate a unique ID when creating a new Party

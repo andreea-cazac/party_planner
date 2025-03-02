@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:party_planner/core/services/calendar_service.dart';
 import 'package:party_planner/core/services/email_sender_service.dart';
 import 'package:party_planner/core/utils/invitation_utils.dart';
 import '../data/models/contact_model.dart';
@@ -20,7 +21,7 @@ class PartyProvider with ChangeNotifier {
   final Map<String, Party> _lastInvitedParties = {};
 
   PartyProvider(this._repository, EmailSenderService emailSenderService)
-      : _upsertPartyUseCase = UpsertPartyUseCase(_repository),
+      : _upsertPartyUseCase = UpsertPartyUseCase(_repository, CalendarService()),
         _inviteGuestsUseCase = InviteGuestsUseCase(emailSenderService) {
     //method executed when the constructor is called
     _loadParties();
@@ -34,8 +35,8 @@ class PartyProvider with ChangeNotifier {
     notifyListeners(); ////“Hey, something changed! Rebuild all widgets that use this provider.”
   }
 
-  void upsertParty(Party party) {
-    _upsertPartyUseCase.execute(party);
+  void upsertParty(Party party) async{
+    await _upsertPartyUseCase.execute(party);
     notifyListeners();
   }
 
